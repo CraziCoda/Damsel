@@ -1,6 +1,5 @@
 #pragma once
 
-
 //-----------------Entry Point----------------
-#include "Damsel/Application.h"
+#include "Damsel/Logger.h"
 //--------------------------------------------
