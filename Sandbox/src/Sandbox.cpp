@@ -1,9 +1,8 @@
 #include "Damsel.h"
 
 int main() {
-	Damsel::Logger car = Damsel::Logger("jeff");
-	Damsel::Logger dog = Damsel::Logger("Dog");
-	std::cout << car.GetName()<< std::endl;
-	std::cout << dog.GetName();
+	Damsel::Logger logger = Damsel::Logger("main");
+	logger.setup("logs.log", "utf-8", Damsel::Logger::Level::INFO);
+	logger.fatal("Hello world");
 	return 0;
-}
+} 

@@ -11,12 +11,30 @@ namespace Damsel {
 		Logger(const std::string& name);
 		~Logger();
 
-		void setup(std::string file, std::string encoding, int level);
+		
 
-		const std::string& GetName();
+		const std::string& getName();
+
+		enum class Level { INFO = 1, WARNING, ERROR, CRITICAL, FATAL };
+
+		void setup(const std::string& file, const std::string& encoding, Level level);
+		const std::string& getLogPath();
+		const std::string& getEncoding();
+		int getLogLevel();
+
+		void info(char* message);
+		void warning(char* message);
+		void error(char* message); 
+		void critical(char* message);
+		void fatal(char* message);
 
 	private:
 		std::string m_Name;
+		std::string log_path;
+		std::string encoding_type;
+		int log_level;
+
+		void log(char* message, int level);
 	};
 
 }
