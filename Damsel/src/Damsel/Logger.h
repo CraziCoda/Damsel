@@ -61,6 +61,6 @@ namespace Damsel {
 		std::string patternCommand(int char_code, char* message);
 
 		// Using File System
-		void writeToFile(char* file);
+		void writeToFile(const std::string& file, const std::string& message);
 	};
 }

@@ -52,7 +52,9 @@ namespace Damsel {
 
 	void Logger::log(char* message, int level)
 	{
-		std::cout << getLogMessage(message) << std::endl;
+		auto message_l = getLogMessage(message);
+		std::cout << message_l << std::endl;
+		writeToFile(log_path, message_l);
 	}
 
 	//Time Functions
@@ -97,7 +99,8 @@ namespace Damsel {
 
 	void Logger::setPattern(char* pattern) { this->pattern = pattern; }
 
-	const std::string Logger::getLogMessage(char* message) {
+	const std::string Logger::getLogMessage(char* message)
+	{
 		std::string new_message = "";
 		for (int i = 0; i < pattern.size(); i++)
 		{
@@ -113,7 +116,8 @@ namespace Damsel {
 		return new_message;
 	}
 
-	std::string Logger::patternCommand(int char_code, char* message) {
+	std::string Logger::patternCommand(int char_code, char* message)
+	{
 		switch (char_code) {
 		case 72:
 			return std::to_string(getHour());
@@ -128,5 +132,18 @@ namespace Damsel {
 		default:
 			return "";
 		}
+	}
+
+	void Logger::writeToFile(const std::string& file, const std::string& message)
+	{
+		std::fstream file_handler;
+
+		file_handler.open(file, std::ios::app);
+		if (file_handler.is_open())
+		{
+			file_handler << message << "\n";
+		}
+
+		file_handler.close();
 	}
 }
