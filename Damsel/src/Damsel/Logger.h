@@ -4,6 +4,10 @@
 #include <string>
 #include <ctime>
 #include <fstream>
+#include <typeinfo>
+#include "sstream"
+#include <chrono>
+
 
 namespace Damsel {
 	class DAMSEL_API  Logger
@@ -19,20 +23,70 @@ namespace Damsel {
 		enum class Level { ALL, INFO = 1, WARNING, ERROR, CRITICAL, FATAL };
 
 		void setup(const std::string& file, const std::string& encoding, Level level = Level::ALL);
-		const std::string& getLogPath();
+		const std::string& getLogPath ();
 		const std::string& getEncoding();
 		int getLogLevel();
 
-		//Logging Functions
-		void info(char* message);
-		void warning(char* message);
-		void error(char* message);
-		void critical(char* message);
-		void fatal(char* message);
+		template<typename T>
+		void info(T	 message)
+		{
+			std::stringstream strm;
+			std::string msg;
 
+			strm << message;
+			log(strm.str(), Level::INFO);
+			
+		}
 
+		template<typename T>
+		void warning(T message)
+		{
+			std::stringstream strm;
+			std::string msg;
 
+			strm << message;
 
+			log(strm.str(), Level::WARNING);
+
+		}
+
+		template<typename T>
+		void error(T	 message)
+		{
+			std::stringstream strm;
+			std::string msg;
+
+			strm << message;
+			log(strm.str(), Level::ERROR);
+
+		}
+	
+		template<typename T>
+		void critical(T	 message)
+		{
+			std::stringstream num;
+			std::stringstream strm;
+			std::string msg;
+
+			strm << message;
+
+			log(strm.str(), Level::CRITICAL);
+
+		}
+
+		template<typename T>
+		void fatal(T	 message)
+		{
+			std::stringstream strm;
+			std::string msg;
+
+			strm << message;
+			log(strm.str(), Level::FATAL);
+
+		}
+
+		//Overload for timing
+		void log(std::chrono::duration<double> record, int type, const std::string& name);
 	private:
 		std::string m_Name;
 		std::string log_path;
@@ -43,7 +97,12 @@ namespace Damsel {
 		time_t currentTime;
 		struct tm* localTime;
 
-		void log(char* message, int level);
+
+		//Logging
+		void log(const std::string msg, Level level);
+
+		
+
 
 		// Time Functions
 		void getCurrentTime();
@@ -62,5 +121,26 @@ namespace Damsel {
 
 		// Using File System
 		void writeToFile(const std::string& file, const std::string& message);
+	};
+
+	class DAMSEL_API TimeEvent {
+	public:
+		void setup(Logger* logger, const std::string& name);
+		void start_stopwatch();
+		void record_stopwatch();
+		void end_stopwatch();
+
+		
+
+	private:
+		
+		std::string name_o;
+		Logger* logger;
+
+		using TimePoint = std::chrono::time_point<std::chrono::system_clock,
+			std::chrono::duration<double>>;
+		TimePoint stopwatch_start;
+		TimePoint stopwatch_end;
+		TimePoint stopwatch_record;
 	};
 }

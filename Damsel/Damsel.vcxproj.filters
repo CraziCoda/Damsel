@@ -13,10 +13,14 @@
     <ClInclude Include="src\Damsel\Logger.h">
       <Filter>Damsel</Filter>
     </ClInclude>
+    <ClInclude Include="src\Damsel\type.h" />
+    <ClInclude Include="src\Damsel\Timer.h" />
+    <ClInclude Include="src\Damsel\TimeEvent.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Damsel\Logger.cpp">
       <Filter>Damsel</Filter>
     </ClCompile>
+    <ClCompile Include="src\Damsel\Timer.cpp" />
   </ItemGroup>
 </Project>
