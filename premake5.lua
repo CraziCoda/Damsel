@@ -18,6 +18,7 @@ project "Damsel"
 	targetdir ("bin/" .. outputDir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputDir .. "/%{prj.name}")
 
+
 	files
 	{
 		"%{prj.name}/src/**.h",
@@ -35,7 +36,7 @@ project "Damsel"
 			"DM_BUILD_DLL"
 		}
 
-		postbuildcommands
+		postbuildcommand
 		{
 			("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputDir .. "/Sandbox")
 		}
@@ -43,6 +44,8 @@ project "Damsel"
 	filter "configurations:Debug"
 		defines "DM_DEBUG"
 		symbols "On"
+
+
 
 	filter "configurations:Release"
 		defines "DM_RELEASE"

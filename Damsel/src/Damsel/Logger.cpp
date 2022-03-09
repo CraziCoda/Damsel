@@ -1,9 +1,12 @@
 #include "Logger.h"
 
+
+
 namespace Damsel {
 	Logger::Logger() : m_Name("root"), log_level(0) { getCurrentTime(); }
 
 	Logger::Logger(const std::string& name) : m_Name(name), log_level(0) { getCurrentTime(); }
+
 	Logger::~Logger() {}
 
 	void Logger::setup(const std::string& file, const std::string& encoding, Logger::Level level)
@@ -12,6 +15,7 @@ namespace Damsel {
 		log_path = file;
 		encoding_type = encoding;
 	}
+
 	const std::string& Logger::getName() { return m_Name; }
 
 	const std::string& Logger::getLogPath() { return log_path; }
@@ -20,39 +24,39 @@ namespace Damsel {
 
 	int Logger::getLogLevel() { return log_level; }
 
-	void Logger::info(char* message)
+	//Logging
+	void Logger::log (std::string msg, Logger::Level level)
 	{
-		Logger::Level level{ Logger::Level::INFO };
-		this->log(message, int(level));
+		const char* str = msg.c_str();
+		char* cstr = new char[msg.length() + 1];
+		strcpy(cstr, str);
+
+		std::cout << getLogMessage(cstr) << std::endl;
+
+		writeToFile(log_path, getLogMessage(cstr));
 	}
 
-	void Logger::warning(char* message)
+	//Overload of log for timing
+	void Logger::log(std::chrono::duration<double> record, int type, const std::string& name)
 	{
-		Logger::Level level{ Logger::Level::WARNING };
-		this->log(message, int(level));
-	}
+		double rec;
+		switch (type) {
+		case 1:
+			std::cout << name << " Started: 0.00000000" << std::endl;
+			writeToFile(log_path, name + " Started: 0.00000000");
+			break;
+		case 2:
+			std::cout << name << ": Time elapsed: " << record.count() << std::endl;
+			rec = record.count();
+			writeToFile(log_path, name +" : Time elapsed: " + std::to_string(rec));
+			break;
+		case 3:
+			std::cout << name <<": Ended with time elapse: " << record.count() << std::endl;
+			rec = record.count();
+			writeToFile(log_path, name + " : Time elapsed: " + std::to_string(rec));
+			break;
+		}
 
-	void Logger::error(char* message)
-	{
-		Logger::Level level{ Logger::Level::ERROR };
-		this->log(message, int(level));
-	}
-
-	void Logger::critical(char* message)
-	{
-		Logger::Level level{ Logger::Level::CRITICAL };
-		this->log(message, int(level));
-	}
-
-	void Logger::fatal(char* message)
-	{
-		Logger::Level level{ Logger::Level::FATAL };
-		this->log(message, int(level));
-	}
-
-	void Logger::log(char* message, int level)
-	{
-		std::cout << getLogMessage(message) << std::endl;
 	}
 
 	//Time Functions
@@ -93,27 +97,29 @@ namespace Damsel {
 	}
 
 	// Set Pattern
-
-
 	void Logger::setPattern(char* pattern) { this->pattern = pattern; }
 
-	const std::string Logger::getLogMessage(char* message) {
+	const std::string Logger::getLogMessage(char* message)
+	{
 		std::string new_message = "";
 		for (int i = 0; i < pattern.size(); i++)
 		{
-			if (int(pattern[i]) == 37) {
-				int char_code = pattern[i + 1];
-				new_message += patternCommand(char_code, message);
+			if (int(pattern[i]) == 37)
+			{
 				i++;
+				int char_code = pattern[i];
+				new_message += patternCommand(char_code, message);	
 			}
-			else {
+			else
+			{
 				new_message += pattern[i];
 			}
 		}
 		return new_message;
 	}
 
-	std::string Logger::patternCommand(int char_code, char* message) {
+	std::string Logger::patternCommand(int char_code, char* message)
+	{
 		switch (char_code) {
 		case 72:
 			return std::to_string(getHour());
@@ -129,4 +135,44 @@ namespace Damsel {
 			return "";
 		}
 	}
+
+	void Logger::writeToFile(const std::string& file, const std::string& message)
+	{
+		std::fstream file_handler;
+
+		file_handler.open(file, std::ios::app);
+		if (file_handler.is_open())
+		{
+			file_handler << message << "\n";
+		}
+
+		file_handler.close();
+	}
+
+	void TimeEvent::setup(Logger* logger, const std::string& name)
+	{
+		this->logger = logger;
+		this->name_o = name;
+	}
+
+	void TimeEvent::start_stopwatch()
+	{
+		stopwatch_start = std::chrono::system_clock::now();
+		logger->log(stopwatch_start - stopwatch_end, 1, name_o);
+	}
+	void TimeEvent::record_stopwatch()
+	{
+		stopwatch_record = std::chrono::system_clock::now();
+		logger->log(stopwatch_record - stopwatch_start, 2, name_o);
+
+	}
+	void TimeEvent::end_stopwatch()
+	{
+		stopwatch_end = std::chrono::system_clock::now();
+		logger->log(stopwatch_end - stopwatch_start, 2, name_o);
+
+		stopwatch_start = std::chrono::system_clock::from_time_t(0);
+
+	}
+
 }
